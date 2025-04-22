@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Edwin Johnson / 001
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -72,18 +72,44 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
-      
-        int numNodes = numExams;  // # of nodes in graph
+    public boolean canFinish(int numExams, int[][] prerequisites) {
+        // Build graph using adjacency list representation
+        ArrayList<Integer>[] adj = getAdjList(numExams, prerequisites);
 
-        // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        // Array to track visited status of nodes: 0 = unvisited, 1 = visiting, 2 = visited
+        int[] visited = new int[numExams];
 
-        // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
+        // Try to perform DFS for each node
+        for (int i = 0; i < numExams; i++) {
+            if (visited[i] == 0 && !dfs(i, adj, visited)) {
+                return false;  // If a cycle is found
+            }
+        }
+        return true;
+    }
 
+    // DFS helper method to detect cycles
+    private boolean dfs(int node, ArrayList<Integer>[] adj, int[] visited) {
+        if (visited[node] == 1) {
+            return false;  // Cycle detected
+        }
+        if (visited[node] == 2) {
+            return true;  // Already processed
+        }
+
+        // Mark the node as being visited (part of current recursion stack)
+        visited[node] = 1;
+
+        // Visit all neighbors
+        for (int neighbor : adj[node]) {
+            if (!dfs(neighbor, adj, visited)) {
+                return false;
+            }
+        }
+
+        // Mark the node as fully processed
+        visited[node] = 2;
+        return true;
     }
 
 
@@ -165,34 +191,45 @@ class ProblemSolutions {
 
     public int numGroups(int[][] adjMatrix) {
         int numNodes = adjMatrix.length;
-        Map<Integer,List<Integer>> graph = new HashMap();
-        int i = 0, j =0;
+        Map<Integer, List<Integer>> graph = new HashMap<>();
 
-        /*
-         * Converting the Graph Adjacency Matrix to
-         * an Adjacency List representation. This
-         * sample code illustrates a technique to do so.
-         */
-
-        for(i = 0; i < numNodes ; i++){
-            for(j = 0; j < numNodes; j++){
-                if( adjMatrix[i][j] == 1 && i != j ){
-                    // Add AdjList for node i if not there
-                    graph.putIfAbsent(i, new ArrayList());
-                    // Add AdjList for node j if not there
-                    graph.putIfAbsent(j, new ArrayList());
-
-                    // Update node i adjList to include node j
+        // Convert the adjacency matrix to an adjacency list
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (adjMatrix[i][j] == 1 && i != j) {
+                    graph.putIfAbsent(i, new ArrayList<>());
+                    graph.putIfAbsent(j, new ArrayList<>());
                     graph.get(i).add(j);
-                    // Update node j adjList to include node i
                     graph.get(j).add(i);
                 }
             }
         }
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+        // Track visited nodes
+        boolean[] visited = new boolean[numNodes];
+        int groups = 0;
+
+        // Explore each node
+        for (int i = 0; i < numNodes; i++) {
+            if (!visited[i]) {
+                dfs(i, graph, visited);
+                groups++;
+            }
+        }
+
+        return groups;
+    }
+
+    // Depth-First Search to mark all connected nodes
+    private void dfs(int node, Map<Integer, List<Integer>> graph, boolean[] visited) {
+        visited[node] = true;
+
+        // If the node has no neighbors (i.e., not in graph), it's isolated
+        for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+            if (!visited[neighbor]) {
+                dfs(neighbor, graph, visited);
+            }
+        }
     }
 
 }
