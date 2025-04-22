@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Edwin Johnson / 001
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -103,8 +103,28 @@ public class Graph {
    */
   
   public int findRoot() {
+    // Array to count the number of incoming edges for each vertex
+    int[] incomingEdges = new int[numVertices];
 
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
-  } 
+    // Traverse the adjacency list and count incoming edges for each destination
+    for (int i = 0; i < numVertices; i++) {
+      for (Integer dest : adjListArr[i]) {
+        incomingEdges[dest]++;
+      }
+    }
+
+    // Now look for a vertex with no incoming edges
+    int rootCount = 0;
+    int rootValue = -1;
+
+    for (int i = 0; i < numVertices; i++) {
+      if (incomingEdges[i] == 0) {
+        rootCount++;
+        rootValue = vertexValues.get(i);  // Get the value of the root vertex
+      }
+    }
+
+    // If there's exactly one root, return its value; otherwise return -1
+    return rootCount == 1 ? rootValue : -1;
+  }
 }
